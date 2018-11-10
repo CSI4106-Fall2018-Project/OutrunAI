@@ -20,6 +20,8 @@ class Display:
 
 			rawFrame = self.capturer.getFrame()
 
+			#horizon = self.findHorizon(rawFrame)
+
 			roadFrame = self.filterLines(rawFrame)
 
 			cv.imshow("Road Frame", roadFrame)
@@ -44,6 +46,28 @@ class Display:
 			print("FPS: ", displayFps, " Slept: ", sleepTime, "ms")
 	
 		return displayFps
+
+	#Takes the raw image capture and finds the position of the horizion
+	def findHorizon(self, inputFrame):
+		if (inputFrame.all() != None):
+			#Do stuff
+			horizon = cv.cvtColor(inputFrame, cv.COLOR_RGB2GRAY)
+			horizon = cv.GaussianBlur(horizon, (5, 5), 0) #Remove sharp edges
+
+			height, width = inputFrame.shape[:2]
+
+			for i in range(0, height - height / 12, height - 12):
+				lines = cv.HoughLinesP(horizon[height//2:height, 0:width], 1, 3.14 / 180, 20, 100, 400)
+
+				for line in lines:
+					position = line[0]
+					cv.line(horizon, (position[0], position[1]), (position[2], position[3]), (0, 0, 0), 1)
+
+			cv.imshow("Horizon image", horizon)
+			return -1
+		else:
+			print("No frame supplied!")
+			return None
 
 	#Takes the raw image capture and isolates the road lines TODO: Create ROI below horizon
 	def filterLines(self, inputFrame):
