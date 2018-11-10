@@ -45,30 +45,6 @@ class Display:
 	
 		return displayFps
 
-		#Old way of doing things (less efficient, more delays)
-		# if (maxFps > self.fps):
-		# 	#Ensure there is always at least 1ms of waiting time
-		# 	sleepTime = max(int((1/self.fps - 1/maxFps) * 1000), 1)
-
-		# 	if cv.waitKey(sleepTime) & 0xFF == ord("q"):
-		# 		cv.destroyAllWindows()
-		# 		sys.exit()
-
-		# 	displayFps = 1/(time.time() - startTime)
-
-		# 	if (verbose == True):
-		# 		print("FPS: ", displayFps, " Slept: ", sleepTime, "ms")
-		# else:
-		# 	#Wait for the minimum amount of time
-		# 	if cv.waitKey(1) & 0xFF == ord("q"):
-		# 		cv.destroyAllWindows()
-		# 		sys.exit()
-
-		# 	displayFps = 1/(time.time() - startTime)
-
-		# 	if (verbose == True):
-		# 		print("Unable to meet desired FPS (", self.fps, "). Currently running at: ", displayFps)
-
 	#Takes the raw image capture and isolates the road lines TODO: Create ROI below horizon
 	def filterLines(self, inputFrame):
 		if (inputFrame.all() != None):
@@ -80,6 +56,19 @@ class Display:
 			#Remove noise
 			kernel = np.ones((3, 3), np.uint8)
 			outputFrame = cv.morphologyEx(outputFrame, cv.MORPH_OPEN, kernel)
+
+			height, width = inputFrame.shape[:2]
+
+			for y in range(height//3 * 2, height, 5):
+				whiteSum = 0
+				whitePixels = 1
+				for x in range(0, width):
+					if (outputFrame.item(y, x) > 0):
+						whiteSum += x
+						whitePixels += 1
+				whiteAverage = whiteSum // whitePixels
+
+				cv.circle(outputFrame, (whiteAverage, y), 2, (255, 255, 255), -1, 8, 0)
 
 			return outputFrame
 		else:

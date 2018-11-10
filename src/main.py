@@ -2,7 +2,7 @@ from Display import Display
 
 #Program entry point
 def main():
-	display = Display("Cannonball", 15)
+	display = Display("Cannonball", 30)
 	display.run()
 
 #Called upon runtime
