@@ -1,34 +1,55 @@
-"""
-CSI4106 Introduction to AI Project
-Justin Huynh
-Cooper Lawrence
-"""
-# Requirements:
-# Python3, pip install keyboard
 
-import keyboard
+import win32api
+import win32con
 
 class Controller:
-    """
-    Class for controlling the player's car via keyboard input.
-    """
-    def __init__(self):
-        pass
 
-    def turn_left(self):
-        keyboard.press('left') #TODO: Update to press_and_release
+    @staticmethod
+    def left():
+        win32api.keybd_event(0x27, 0, win32con.KEYEVENTF_KEYUP, 0)
+        win32api.keybd_event(0x25, 0, 0, 0)
 
-    def turn_left_accelerate(self):
-        keyboard.press('left, z')
+    @staticmethod
+    def right():
+        win32api.keybd_event(0x25, 0, win32con.KEYEVENTF_KEYUP, 0)
+        win32api.keybd_event(0x27, 0, 0, 0)
 
-    def turn_right(self):
-        keyboard.press('right')
+    @staticmethod
+    def straight():
+        win32api.keybd_event(0x25, 0, win32con.KEYEVENTF_KEYUP, 0)
+        win32api.keybd_event(0x27, 0, win32con.KEYEVENTF_KEYUP, 0)
 
-    def turn_right_accelerate(self):
-        keyboard.press('right, z')
+    @staticmethod
+    def accelerate():
+        win32api.keybd_event(0x58, 0, win32con.KEYEVENTF_KEYUP, 0)
+        win32api.keybd_event(0x5A, 0, 0, 0)
 
-    def accelerate(self):
-        keyboard.press('z')
+    @staticmethod
+    def brake():
+        win32api.keybd_event(0x5A, 0, win32con.KEYEVENTF_KEYUP, 0)
+        win32api.keybd_event(0x58, 0, 0, 0)
 
-    def brake(self):
-        keyboard.press('x')
+    @staticmethod
+    def coast():
+        win32api.keybd_event(0x58, 0, win32con.KEYEVENTF_KEYUP, 0)
+        win32api.keybd_event(0x5A, 0, win32con.KEYEVENTF_KEYUP, 0)
+
+    @staticmethod
+    def start():
+        win32api.keybd_event(0x31, 0, 0, 0)
+        win32api.keybd_event(0x31, 0, win32con.KEYEVENTF_KEYUP, 0)
+
+    @staticmethod
+    def insertCoin():
+        win32api.keybd_event(0x35, 0, 0, 0)
+        win32api.keybd_event(0x35, 0, win32con.KEYEVENTF_KEYUP, 0)
+
+    @staticmethod
+    def pause():
+        win32api.keybd_event(0x70, 0, 0, 0)
+        win32api.keybd_event(0x70, 0, win32con.KEYEVENTF_KEYUP, 0)
+
+    @staticmethod
+    def nextFrame():
+        win32api.keybd_event(0x71, 0, 0, 0)
+        win32api.keybd_event(0x71, 0, win32con.KEYEVENTF_KEYUP, 0)
