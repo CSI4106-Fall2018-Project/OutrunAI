@@ -114,6 +114,6 @@ class Display:
 			xAvg /= numberPoints
 			yAvg /= numberPoints
 
-			return vxAvg[0], xAvg, outputFrame
+			return vxAvg[0], xAvg[0], outputFrame
 
 		return -99, -99, outputFrame #Default return (no lines found)
