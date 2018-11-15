@@ -58,7 +58,7 @@ class Display:
 
 		if (verbose == True):
 			print("FPS: ", displayFps, " Slept: ", sleepTime, "ms")
-	
+
 		return displayFps
 
 	#Takes the raw image capture and isolates the road lines
@@ -73,7 +73,7 @@ class Display:
 			print("No frame supplied!")
 			return None
 
-	#Calculates 
+	#Calculates road curvature and car position
 	def calculateCurvature(self, inputFrame):
 		height, width = inputFrame.shape[:2]
 
@@ -101,7 +101,7 @@ class Display:
 					cv.arrowedLine(outputFrame, (x, y), (x + (20 * vx), y + (20 * vy)), (255, 255, 255), 2, tipLength=0.5) #Display the direction of each moment
 					#cv.line(outputFrame, (x, y), (x + (20 * vx), y + (20 * vy)), (255, 255, 255), 3)
 					cv.putText(outputFrame, str(vx[0])[:5], (x, y), cv.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255))
-						
+
 					vxAvg += vx
 					vyAvg += vy
 					xAvg += x
@@ -114,6 +114,6 @@ class Display:
 			xAvg /= numberPoints
 			yAvg /= numberPoints
 
-			return vxAvg[0], xAvg, outputFrame
-		
+			return vxAvg[0], xAvg[0], outputFrame
+
 		return -99, -99, outputFrame #Default return (no lines found)
