@@ -73,7 +73,7 @@ class Display:
 			print("No frame supplied!")
 			return None
 
-	#Calculates
+	#Calculates road curvature and car position
 	def calculateCurvature(self, inputFrame):
 		height, width = inputFrame.shape[:2]
 
