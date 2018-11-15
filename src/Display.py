@@ -81,8 +81,6 @@ class Display:
 
 			outputFrame, contours, hierarchy = cv.findContours(outputFrame, 0, 2)
 
-			#outputFrame = np.zeros((height, width, 1), np.uint8)
-
 			vxAvg = 0
 			vyAvg = 0
 			xAvg = 0
@@ -117,75 +115,20 @@ class Display:
 				xAvg /= numberPoints
 				yAvg /= numberPoints
 
-				cv.line(outputFrame, (xAvg, yAvg), (xAvg + (20 * vxAvg), yAvg + (20 * vyAvg)), (255, 255, 255), 1)
+				cv.line(outputFrame, (xAvg, yAvg), (xAvg + (50 * vxAvg), yAvg + (50 * vyAvg)), (255, 255, 255), 2)
 
-				#print("Road curvature: ", width//2 - xAvg / numberPoints)
-				print("Road curvature: ", vxAvg)
+				print("Road curvature: ", vxAvg[0], " Car position: ", width//2 - xAvg[0])
 
-			#TODO: Work on the following experimental curve detection
-			# rvxAvg = 0
-			# rvyAvg = 0
-			# rxAvg = 0
-			# ryAvg = 0
-			# rNumberPoints = 0
-
-			# lvxAvg = 0
-			# lvyAvg = 0
-			# lxAvg = 0
-			# lyAvg = 0
-			# lNumberPoints = 0
-			# for cnt in contours:
-			# 	#check blob size
-			# 	if (cv.contourArea(cnt) > 20):
-
-			# 		moment = cv.moments(cnt) #Calculate the moment of each blob
-
-			# 		[vx,vy,x,y] = cv.fitLine(cnt, cv.DIST_L2, 0, 0.01, 0.01) #Fit a straight line to each moment
-
-			# 		if (y > height//3 and abs(vx) > 0.05 and abs(vx) < 0.99):
-			# 			if (x > width//2):
-			# 				vx *= -1;
-			# 				vy *= -1;
-
-			# 				rvxAvg += vx
-			# 				rvyAvg += vy
-			# 				rxAvg += x
-			# 				ryAvg += y
-			# 				rNumberPoints += 1
-			# 			else:
-			# 				lvxAvg += vx
-			# 				lvyAvg += vy
-			# 				lxAvg += x
-			# 				lyAvg += y
-			# 				lNumberPoints += 1
-
-
-			# 			cv.arrowedLine(outputFrame, (x, y), (x + (20 * vx), y + (20 * vy)), (255, 255, 255), 2, tipLength=0.5) #Display the direction of each moment
-			# 			#cv.line(outputFrame, (x, y), (x + (20 * vx), y + (20 * vy)), (255, 255, 255), 3)
-			# 			cv.putText(outputFrame, str(vx[0])[:5], (x, y), cv.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255))
-			
-			# if (rNumberPoints > 0):
-			# 	rvxAvg /= -rNumberPoints
-			# 	rvyAvg /= rNumberPoints
-			# 	rxAvg /= rNumberPoints
-			# 	ryAvg /= rNumberPoints
-
-			# if (lNumberPoints > 0):
-			# 	lvxAvg /= -lNumberPoints
-			# 	lvyAvg /= lNumberPoints
-			# 	lxAvg /= lNumberPoints
-			# 	lyAvg /= lNumberPoints
-
-			# if (rNumberPoints + lNumberPoints > 0):
-			# 	vxAvg = (rvxAvg + lvxAvg)/2
-			# 	vyAvg = (rvyAvg + lvyAvg)/2
-			# 	xAvg = (rxAvg + lxAvg)/2
-			# 	yAvg = (ryAvg + lyAvg)/2
-
-			# 	cv.line(outputFrame, (xAvg, yAvg), (xAvg + (20 * vxAvg), yAvg + (20 * vyAvg)), (255, 255, 255), 1)
-
-			# 	#print("Road curvature: ", width//2 - xAvg / numberPoints)
-			# 	print("Road curvature: ", vxAvg)
+				#Extremely simple decision tree for controlling the car's steering
+				# if (vxAvg[0] < -0.05):
+				# 	print("Left")
+				# 	Controller.left()
+				# elif (vxAvg[0] > 0.05):
+				# 	print("Right")
+				# 	Controller.right()
+				# else:
+				# 	print("Straight")
+				# 	Controller.straight()
 
 			return outputFrame
 		else:
