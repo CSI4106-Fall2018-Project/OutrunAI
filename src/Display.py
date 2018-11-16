@@ -1,7 +1,8 @@
-import numpy as np #Image storage used by OpenCV
+import sys
 import win32gui as win32 #Windows
-
 import time #For timing analysis and framerate synchronization
+
+import numpy as np #Image storage used by OpenCV
 import cv2 as cv #OpenCV for image processing
 
 from Capturer import Capturer #Capturer to grab frames
@@ -28,15 +29,15 @@ class Display:
 			print("Road curvature: ", roadCurvature, " Car position: ", carPosition)
 
 			#Extremely simple decision tree for controlling the car's steering
-			# if (vxAvg[0] < -0.05):
-			# 	print("Left")
-			# 	Controller.left()
-			# elif (vxAvg[0] > 0.05):
-			# 	print("Right")
-			# 	Controller.right()
-			# else:
-			# 	print("Straight")
-			# 	Controller.straight()
+			if (roadCurvature < -0.05):
+				print("Left")
+				Controller.left()
+			elif (roadCurvature > 0.05):
+				print("Right")
+				Controller.right()
+			else:
+				print("Straight")
+				Controller.straight()
 
 			cv.imshow("Road Frame", outputFrame)
 
@@ -52,7 +53,7 @@ class Display:
 
 		if cv.waitKey(sleepTime) & 0xFF == ord("q"):
 			cv.destroyAllWindows()
-			sys.exit()
+			sys.exit(0)
 
 		displayFps = 1/(time.time() - startTime)
 
