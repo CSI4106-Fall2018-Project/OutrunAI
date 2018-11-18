@@ -26,18 +26,22 @@ class Display:
 
 			roadCurvature, carPosition, outputFrame = self.calculateCurvature(roadFrame)
 
-			print("Road curvature: ", roadCurvature, " Car position: ", carPosition)
+			#print("Road curvature: ", roadCurvature, " Car position: ", carPosition)
+
+			speed = self.calculateSpeed(rawFrame)
+
+			print(speed, "km/h")
 
 			#Extremely simple decision tree for controlling the car's steering
-			if (roadCurvature < -0.05):
-				print("Left")
-				Controller.left()
-			elif (roadCurvature > 0.05):
-				print("Right")
-				Controller.right()
-			else:
-				print("Straight")
-				Controller.straight()
+			# if (roadCurvature < -0.05):
+			# 	print("Left")
+			# 	Controller.left()
+			# elif (roadCurvature > 0.05):
+			# 	print("Right")
+			# 	Controller.right()
+			# else:
+			# 	print("Straight")
+			# 	Controller.straight()
 
 			cv.imshow("Road Frame", outputFrame)
 
@@ -118,3 +122,76 @@ class Display:
 			return vxAvg[0], xAvg[0], outputFrame
 
 		return -99, -99, outputFrame #Default return (no lines found)
+
+	#Gets the speed displayed on the screen
+	def calculateSpeed(self, inputFrame):
+		if (inputFrame.all() != None):
+			#Digit one
+			digitOne = inputFrame[408:430, 50:62][:,:,2]
+			ret, digitOne = cv.threshold(digitOne, 254, 255, cv.THRESH_BINARY) #Threshold the image to find the lines
+
+			digitOneLeft = inputFrame[408:430, 50:56][:,:,2]
+			ret, digitOneLeft = cv.threshold(digitOneLeft, 254, 255, cv.THRESH_BINARY) #Threshold the image to find the lines
+
+			hundreds = cv.countNonZero(digitOne) + cv.countNonZero(digitOneLeft)
+			hundreds = self.convertSpeed(hundreds)
+
+			#Digit two
+			digitTwo = inputFrame[408:430, 66:78][:,:,2]
+			ret, digitTwo = cv.threshold(digitTwo, 254, 255, cv.THRESH_BINARY) #Threshold the image to find the lines
+
+			digitTwoLeft = inputFrame[408:430, 66:72][:,:,2]
+			ret, digitTwoLeft = cv.threshold(digitTwoLeft, 254, 255, cv.THRESH_BINARY) #Threshold the image to find the lines
+
+			tens = cv.countNonZero(digitTwo) + cv.countNonZero(digitTwoLeft)
+			tens = self.convertSpeed(tens)
+
+			print(cv.countNonZero(digitTwo), ", ",  cv.countNonZero(digitTwoLeft))
+
+			#Digit three
+			digitThree = inputFrame[408:430, 82:94][:,:,2]
+			ret, digitThree = cv.threshold(digitThree, 254, 255, cv.THRESH_BINARY) #Threshold the image to find the lines
+
+			digitThreeLeft = inputFrame[408:430, 82:88][:,:,2]
+			ret, digitThreeLeft = cv.threshold(digitThreeLeft, 254, 255, cv.THRESH_BINARY) #Threshold the image to find the lines
+
+			ones = cv.countNonZero(digitThree) + cv.countNonZero(digitThreeLeft)
+			ones = self.convertSpeed(ones)
+
+			return str(hundreds) + str(tens) + str(ones)
+		else:
+			print("No frame supplied!")
+			return -1
+
+	#Helper method to decode the digits into their real values based on the below table:
+	# 0: 96 + 48 = 144
+	# 1: 40 + 0 = 40
+	# 2: 88 + 44 = 132
+	# 3: 92 + 36 = 128
+	# 4: 76 + 28 = 104
+	# 5: 80 + 40 = 120
+	# 6: 96 + 56 = 152
+	# 7: 68 + 24 = 92
+	# 8: 112 + 56 = 168
+	# 9: 96 + 40 = 136
+	def convertSpeed(self, num):
+		if (num == 0 or num == 144):
+			return 0
+		elif (num == 40):
+			return 1
+		elif (num == 132):
+			return 2
+		elif (num == 128):
+			return 3
+		elif (num == 104):
+			return 4
+		elif (num == 120):
+			return 5
+		elif (num == 152):
+			return 6
+		elif (num == 92):
+			return 7
+		elif (num == 168):
+			return 8
+		elif (num == 136):
+			return 9
