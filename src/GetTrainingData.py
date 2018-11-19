@@ -45,8 +45,7 @@ def annotate():
 			rawFrame = display.capturer.getFrame()
 			roadFrame = display.filterLines(rawFrame)
 			curvature, car_position, _ = display.calculateCurvature(roadFrame)
-			# speed = MemoryScanner.readSpeed() # TODO: Implement MemoryScanner.readSpeed
-			speed = 0
+			speed = display.calculateSpeed(rawFrame)
 
 			throttle['Curvature'].append(curvature)
 			throttle['Speed'].append(speed)
@@ -67,6 +66,7 @@ def annotate():
 		except KeyboardInterrupt:
 			exportData()
 			break
+
 
 def getThrottle():
 	# Get the keypress
