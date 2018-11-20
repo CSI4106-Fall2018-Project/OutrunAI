@@ -6,6 +6,8 @@ import numpy as np #Image storage used by OpenCV
 import cv2 as cv #OpenCV for image processing
 
 from Capturer import Capturer #Capturer to grab frames
+from DecisionTree import DecisionTree
+from MultilayerPerceptron import MultilayerPerception
 from Controller import Controller
 
 class Display:
@@ -14,8 +16,20 @@ class Display:
 		self.capturer = Capturer(windowTitle)
 		self.fps = fps
 
+		self.decisionTreeThrottle = DecisionTree('training/Throttle.csv')
+		self.decisionTreeThrottle.fit()
+
+		self.decisionTreeSteering = DecisionTree('training/Steering.csv')
+		self.decisionTreeSteering.fit()
+
+		self.neuralNetThrottle = MultilayerPerception('training/Throttle.csv')
+		self.neuralNetThrottle.fit()
+
+		self.neuralNetSteering = MultilayerPerception('training/Steering.csv')
+		self.neuralNetSteering.fit()
+
 	#Main program
-	def run(self):
+	def run(self, model):
 		#Start the capture loop
 		while(True):
 			startTime = time.time()
@@ -32,6 +46,35 @@ class Display:
 
 			print(speed, "km/h")
 
+			if model == "DecisionTree":
+				if self.decisionTreeThrottle.predict([[roadCurvature, speed, carPosition]])[0] == 'Accelerate':
+					Controller.accelerate()
+				elif self.decisionTreeThrottle.predict([[roadCurvature, speed, carPosition]])[0] == 'Brake':
+					Controller.brake()
+				elif self.decisionTreeThrottle.predict([[roadCurvature, speed, carPosition]])[0] == 'Coast':
+					Controller.coast()
+
+				if self.decisionTreeSteering.predict([[roadCurvature, speed, carPosition]])[0] == 'Left':
+					Controller.left()
+				elif self.decisionTreeSteering.predict([[roadCurvature, speed, carPosition]])[0] == 'Right':
+					Controller.right()
+				elif self.decisionTreeSteering.predict([[roadCurvature, speed, carPosition]])[0] == 'Straight':
+					Controller.straight()
+
+			elif model == "NeuralNet":
+				if self.neuralNetThrottle.predict([[roadCurvature, speed, carPosition]])[0] == 'Accelerate':
+					Controller.accelerate()
+				elif self.neuralNetThrottle.predict([[roadCurvature, speed, carPosition]])[0] == 'Brake':
+					Controller.brake()
+				elif self.neuralNetThrottle.predict([[roadCurvature, speed, carPosition]])[0] == 'Coast':
+					Controller.coast()
+
+				if self.neuralNetSteering.predict([[roadCurvature, speed, carPosition]])[0] == 'Left':
+					Controller.left()
+				elif self.neuralNetSteering.predict([[roadCurvature, speed, carPosition]])[0] == 'Right':
+					Controller.right()
+				elif self.neuralNetSteering.predict([[roadCurvature, speed, carPosition]])[0] == 'Straight':
+					Controller.straight()
 			#Extremely simple decision tree for controlling the car's steering
 			# if (roadCurvature < -0.05):
 			# 	print("Left")
