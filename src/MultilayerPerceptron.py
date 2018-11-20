@@ -11,7 +11,7 @@ class MultilayerPerception:
 		self.observation = self.data.loc[:, 'Class']
 
 		#Creates a new Multilayer Perceptron classifier using default parameters
-		self.classifier = MLPClassifier()
+		self.classifier = MLPClassifier.MLPClassifier()
 
 	#Train the model based on recorded training data
 	def fit(self):
@@ -25,5 +25,6 @@ class MultilayerPerception:
 	def loadModel(self, fileName):
 		self.classifier = joblib.load(fileName)
 
+	#Predicts the output of the trained MLP based on input data
 	def predict(self, inputData):
 		return self.classifier.predict(inputData)
