@@ -6,6 +6,8 @@ import numpy as np #Image storage used by OpenCV
 import cv2 as cv #OpenCV for image processing
 
 from Capturer import Capturer #Capturer to grab frames
+from DecisionTree import DecisionTree
+from MultilayerPerceptron import MultilayerPerception
 from Controller import Controller
 
 class Display:
@@ -14,8 +16,20 @@ class Display:
 		self.capturer = Capturer(windowTitle)
 		self.fps = fps
 
+		self.decisionTreeThrottle = DecisionTree('training/Throttle.csv')
+		self.decisionTreeThrottle.fit()
+
+		self.decisionTreeSteering = DecisionTree('training/Steering.csv')
+		self.decisionTreeSteering.fit()
+
+		self.neuralNetThrottle = MultilayerPerception('training/Throttle.csv')
+		self.neuralNetThrottle.fit()
+
+		self.neuralNetSteering = MultilayerPerception('training/Steering.csv')
+		self.neuralNetSteering.fit()
+
 	#Main program
-	def run(self):
+	def run(self, model):
 		#Start the capture loop
 		while(True):
 			startTime = time.time()
@@ -32,6 +46,35 @@ class Display:
 
 			print(speed, "km/h")
 
+			if model == "DecisionTree":
+				if self.decisionTreeThrottle.predict([[roadCurvature, speed, carPosition]])[0] == 'Accelerate':
+					Controller.accelerate()
+				elif self.decisionTreeThrottle.predict([[roadCurvature, speed, carPosition]])[0] == 'Brake':
+					Controller.brake()
+				elif self.decisionTreeThrottle.predict([[roadCurvature, speed, carPosition]])[0] == 'Coast':
+					Controller.coast()
+
+				if self.decisionTreeSteering.predict([[roadCurvature, speed, carPosition]])[0] == 'Left':
+					Controller.left()
+				elif self.decisionTreeSteering.predict([[roadCurvature, speed, carPosition]])[0] == 'Right':
+					Controller.right()
+				elif self.decisionTreeSteering.predict([[roadCurvature, speed, carPosition]])[0] == 'Straight':
+					Controller.straight()
+
+			elif model == "NeuralNet":
+				if self.neuralNetThrottle.predict([[roadCurvature, speed, carPosition]])[0] == 'Accelerate':
+					Controller.accelerate()
+				elif self.neuralNetThrottle.predict([[roadCurvature, speed, carPosition]])[0] == 'Brake':
+					Controller.brake()
+				elif self.neuralNetThrottle.predict([[roadCurvature, speed, carPosition]])[0] == 'Coast':
+					Controller.coast()
+
+				if self.neuralNetSteering.predict([[roadCurvature, speed, carPosition]])[0] == 'Left':
+					Controller.left()
+				elif self.neuralNetSteering.predict([[roadCurvature, speed, carPosition]])[0] == 'Right':
+					Controller.right()
+				elif self.neuralNetSteering.predict([[roadCurvature, speed, carPosition]])[0] == 'Straight':
+					Controller.straight()
 			#Extremely simple decision tree for controlling the car's steering
 			# if (roadCurvature < -0.05):
 			# 	print("Left")
@@ -123,47 +166,48 @@ class Display:
 
 		return -99, -99, outputFrame #Default return (no lines found)
 
-	#Gets the speed displayed on the screen
+	#Gets the speed displayed on the screen, using a modular method that works with different screen resolutions
 	def calculateSpeed(self, inputFrame):
 		if (inputFrame.all() != None):
+			height, width = inputFrame.shape[:2]
+			numberSize = (int(round(0.0969 * width)) - int(round(0.0781 * width))) * (int(round(0.9598 * height)) - int(round(0.9107 * height)))
+
 			#Digit one
-			digitOne = inputFrame[408:430, 50:62][:,:,2]
+			digitOne = inputFrame[int(round(0.9107 * height)):int(round(0.9598 * height)), int(round(0.0781 * width)):int(round(0.0969 * width))][:,:,2]
 			ret, digitOne = cv.threshold(digitOne, 254, 255, cv.THRESH_BINARY) #Threshold the image to find the lines
 
-			digitOneLeft = inputFrame[408:430, 50:56][:,:,2]
+			digitOneLeft = inputFrame[int(round(0.9107 * height)):int(round(0.9598 * height)), int(round(0.0781 * width)):int(round(0.0875 * width))][:,:,2]
 			ret, digitOneLeft = cv.threshold(digitOneLeft, 254, 255, cv.THRESH_BINARY) #Threshold the image to find the lines
 
 			hundreds = cv.countNonZero(digitOne) + cv.countNonZero(digitOneLeft)
-			hundreds = self.convertSpeed(hundreds)
+			hundreds = self.convertSpeed(hundreds, numberSize)
 
 			#Digit two
-			digitTwo = inputFrame[408:430, 66:78][:,:,2]
+			digitTwo = inputFrame[int(round(0.9107 * height)):int(round(0.9598 * height)), int(round(0.1031 * width)):int(round(0.1219 * width))][:,:,2]
 			ret, digitTwo = cv.threshold(digitTwo, 254, 255, cv.THRESH_BINARY) #Threshold the image to find the lines
 
-			digitTwoLeft = inputFrame[408:430, 66:72][:,:,2]
+			digitTwoLeft = inputFrame[int(round(0.9107 * height)):int(round(0.9598 * height)), int(round(0.1031 * width)):int(round(0.1125 * width))][:,:,2]
 			ret, digitTwoLeft = cv.threshold(digitTwoLeft, 254, 255, cv.THRESH_BINARY) #Threshold the image to find the lines
 
 			tens = cv.countNonZero(digitTwo) + cv.countNonZero(digitTwoLeft)
-			tens = self.convertSpeed(tens)
-
-			print(cv.countNonZero(digitTwo), ", ",  cv.countNonZero(digitTwoLeft))
+			tens = self.convertSpeed(tens, numberSize)
 
 			#Digit three
-			digitThree = inputFrame[408:430, 82:94][:,:,2]
+			digitThree = inputFrame[int(round(0.9107 * height)):int(round(0.9598 * height)), int(round(0.1281 * width)):int(round(0.1469 * width))][:,:,2]
 			ret, digitThree = cv.threshold(digitThree, 254, 255, cv.THRESH_BINARY) #Threshold the image to find the lines
 
-			digitThreeLeft = inputFrame[408:430, 82:88][:,:,2]
+			digitThreeLeft = inputFrame[int(round(0.9107 * height)):int(round(0.9598 * height)), int(round(0.1281 * width)):int(round(0.1375 * width))][:,:,2]
 			ret, digitThreeLeft = cv.threshold(digitThreeLeft, 254, 255, cv.THRESH_BINARY) #Threshold the image to find the lines
 
 			ones = cv.countNonZero(digitThree) + cv.countNonZero(digitThreeLeft)
-			ones = self.convertSpeed(ones)
+			ones = self.convertSpeed(ones, numberSize)
 
 			return str(hundreds) + str(tens) + str(ones)
 		else:
 			print("No frame supplied!")
 			return -1
 
-	#Helper method to decode the digits into their real values based on the below table:
+	#Helper method to decode the digits into their real values based on the below table (640x448), numberSize = 264:
 	# 0: 96 + 48 = 144
 	# 1: 40 + 0 = 40
 	# 2: 88 + 44 = 132
@@ -174,24 +218,26 @@ class Display:
 	# 7: 68 + 24 = 92
 	# 8: 112 + 56 = 168
 	# 9: 96 + 40 = 136
-	def convertSpeed(self, num):
-		if (num == 0 or num == 144):
+	def convertSpeed(self, num, numberSize):
+		pixelRatio = num / numberSize
+
+		if (pixelRatio == 0 or pixelRatio == 144 / 264):
 			return 0
-		elif (num == 40):
+		elif (pixelRatio == 40 / 264):
 			return 1
-		elif (num == 132):
+		elif (pixelRatio == 132 / 264):
 			return 2
-		elif (num == 128):
+		elif (pixelRatio == 128 / 264):
 			return 3
-		elif (num == 104):
+		elif (pixelRatio == 104 / 264):
 			return 4
-		elif (num == 120):
+		elif (pixelRatio == 120 / 264):
 			return 5
-		elif (num == 152):
+		elif (pixelRatio == 152 / 264):
 			return 6
-		elif (num == 92):
+		elif (pixelRatio == 92 / 264):
 			return 7
-		elif (num == 168):
+		elif (pixelRatio == 168 / 264):
 			return 8
-		elif (num == 136):
+		elif (pixelRatio == 136 / 264):
 			return 9
