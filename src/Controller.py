@@ -1,4 +1,3 @@
-
 import win32api
 import win32con
 
@@ -13,6 +12,16 @@ class Controller:
     def right():
         win32api.keybd_event(0x25, 0, win32con.KEYEVENTF_KEYUP, 0)
         win32api.keybd_event(0x27, 0, 0, 0)
+
+    @staticmethod
+    def up():
+        win32api.keybd_event(0x26, 0, 0, 0)
+        win32api.keybd_event(0x26, 0, win32con.KEYEVENTF_KEYUP, 0)
+
+    @staticmethod
+    def down():
+        win32api.keybd_event(0x28, 0, 0, 0)
+        win32api.keybd_event(0x28, 0, win32con.KEYEVENTF_KEYUP, 0)
 
     @staticmethod
     def straight():
@@ -53,3 +62,8 @@ class Controller:
     def nextFrame():
         win32api.keybd_event(0x71, 0, 0, 0)
         win32api.keybd_event(0x71, 0, win32con.KEYEVENTF_KEYUP, 0)
+
+    @staticmethod
+    def startGame():
+        insertCoin()
+        start()
