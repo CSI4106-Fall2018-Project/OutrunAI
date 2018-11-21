@@ -102,6 +102,3 @@ venv.bak/
 
 # mypy
 .mypy_cache/
-
-# Comma separated value files used for storing training data
-*.csv
