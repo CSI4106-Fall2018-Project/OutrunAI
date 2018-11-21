@@ -10,7 +10,7 @@ Extract features --> Predict using learning model --> Simulate controller input
 Two supervised learning models have been implemented: a Decision Tree and a Multilayer Perceptron.
 
 ## Repository Breakdown
-src/ - Python 3 source files.
+src/ - Python 3 source files.  
 training/ - Sample training data and pre-fit learning models.
 
 ## Dependencies
