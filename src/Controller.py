@@ -67,3 +67,8 @@ class Controller:
     def startGame():
         insertCoin()
         start()
+
+    @staticmethod
+    def changeView():
+        win32api.keybd_event(0x10, 0, 0, 0)
+        win32api.keybd_event(0x10, 0, win32con.KEYEVENTF_KEYUP, 0)

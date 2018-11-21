@@ -12,24 +12,26 @@ from Controller import Controller
 
 class Display:
 	#Constructor
-	def __init__(self, windowTitle = "", fps = -1):
+	def __init__(self, trainedModelThrottle, trainedModelSteering, runMode = "NeuralNet", windowTitle = "", fps = -1):
+		self.trainedModelThrottle = trainedModelThrottle
+		self.trainedModelSteering = trainedModelSteering
+		self.runMode = runMode
+
 		self.capturer = Capturer(windowTitle)
 		self.fps = fps
 
-		self.decisionTreeThrottle = DecisionTree('training/Throttle.csv')
-		self.decisionTreeThrottle.fit()
+		if (self.runMode == "DecisionTree"):
+			self.modelThrottle = DecisionTree()
+			self.modelSteering = DecisionTree()
+		else:
+			self.modelThrottle = MultilayerPerception(False)
+			self.modelSteering = MultilayerPerception(False)
 
-		self.decisionTreeSteering = DecisionTree('training/Steering.csv')
-		self.decisionTreeSteering.fit()
-
-		self.neuralNetThrottle = MultilayerPerception('training/Throttle.csv')
-		self.neuralNetThrottle.fit()
-
-		self.neuralNetSteering = MultilayerPerception('training/Steering.csv')
-		self.neuralNetSteering.fit()
+		self.modelThrottle.loadModel(self.trainedModelThrottle)
+		self.modelSteering.loadModel(self.trainedModelSteering)
 
 	#Main program
-	def run(self, model):
+	def run(self):
 		#Start the capture loop
 		while(True):
 			startTime = time.time()
@@ -40,53 +42,35 @@ class Display:
 
 			roadCurvature, carPosition, outputFrame = self.calculateCurvature(roadFrame)
 
-			#print("Road curvature: ", roadCurvature, " Car position: ", carPosition)
-
 			speed = self.calculateSpeed(rawFrame)
 
-			print(speed, "km/h")
+			#Predict how to change throttle based on loaded model
+			if self.modelThrottle.predict([[roadCurvature, int(speed), carPosition]])[0] == "Accelerate":
+				Controller.accelerate()
+				print("Accelerate ", end = '')
+			elif self.modelThrottle.predict([[roadCurvature, int(speed), carPosition]])[0] == "Brake":
+				Controller.brake()
+				print("Brake ", end = '')
+			elif self.modelThrottle.predict([[roadCurvature, int(speed), carPosition]])[0] == "Coast":
+				Controller.coast()
+				print("Coast ", end = '')
+			else:
+				print("Error ", self.modelThrottle.predict([[roadCurvature, int(speed), carPosition]])[0], " ", end = '')
 
-			if model == "DecisionTree":
-				if self.decisionTreeThrottle.predict([[roadCurvature, speed, carPosition]])[0] == 'Accelerate':
-					Controller.accelerate()
-				elif self.decisionTreeThrottle.predict([[roadCurvature, speed, carPosition]])[0] == 'Brake':
-					Controller.brake()
-				elif self.decisionTreeThrottle.predict([[roadCurvature, speed, carPosition]])[0] == 'Coast':
-					Controller.coast()
-
-				if self.decisionTreeSteering.predict([[roadCurvature, speed, carPosition]])[0] == 'Left':
-					Controller.left()
-				elif self.decisionTreeSteering.predict([[roadCurvature, speed, carPosition]])[0] == 'Right':
-					Controller.right()
-				elif self.decisionTreeSteering.predict([[roadCurvature, speed, carPosition]])[0] == 'Straight':
-					Controller.straight()
-
-			elif model == "NeuralNet":
-				if self.neuralNetThrottle.predict([[roadCurvature, speed, carPosition]])[0] == 'Accelerate':
-					Controller.accelerate()
-				elif self.neuralNetThrottle.predict([[roadCurvature, speed, carPosition]])[0] == 'Brake':
-					Controller.brake()
-				elif self.neuralNetThrottle.predict([[roadCurvature, speed, carPosition]])[0] == 'Coast':
-					Controller.coast()
-
-				if self.neuralNetSteering.predict([[roadCurvature, speed, carPosition]])[0] == 'Left':
-					Controller.left()
-				elif self.neuralNetSteering.predict([[roadCurvature, speed, carPosition]])[0] == 'Right':
-					Controller.right()
-				elif self.neuralNetSteering.predict([[roadCurvature, speed, carPosition]])[0] == 'Straight':
-					Controller.straight()
-			#Extremely simple decision tree for controlling the car's steering
-			# if (roadCurvature < -0.05):
-			# 	print("Left")
-			# 	Controller.left()
-			# elif (roadCurvature > 0.05):
-			# 	print("Right")
-			# 	Controller.right()
-			# else:
-			# 	print("Straight")
-			# 	Controller.straight()
-
-			cv.imshow("Road Frame", outputFrame)
+			#Predict how to steer based on the loaded model
+			if self.modelSteering.predict([[roadCurvature, int(speed), carPosition]])[0] == "Left":
+				Controller.left()
+				print("Left")
+			elif self.modelSteering.predict([[roadCurvature, int(speed), carPosition]])[0] == "Right":
+				Controller.right()
+				print("Right")
+			elif self.modelSteering.predict([[roadCurvature, int(speed), carPosition]])[0] == "Straight":
+				Controller.straight()
+				print("Straight")
+			else:
+				print("Error ", self.modelSteering.predict([[roadCurvature, int(speed), carPosition]])[0])
+			
+			#cv.imshow("Road Frame", outputFrame)
 
 			#Should ALWAYS be called last (to ensure accurate synchronization and avoid undetectable delays)
 			self.syncClock(startTime, time.time(), False)

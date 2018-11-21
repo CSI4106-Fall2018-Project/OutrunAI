@@ -5,17 +5,17 @@ import pandas as pd #For loading data from csv file
 class DecisionTree:
 
 	#Constructor
-	def __init__(self, trainingData):
-		self.data = pd.read_csv(trainingData)
-		self.features = self.data.loc[:, 'Curvature':'CarPosition']
-		self.observation = self.data.loc[:, 'Class']
-
+	def __init__(self):
 		#Creates a new Decision tree classifier using default parameters
 		self.classifier = tree.DecisionTreeClassifier()
 	
 	#Train the model based on recorded training data
-	def fit(self):
-		self.classifier = self.classifier.fit(self.features, self.observation)
+	def fit(self, trainingData):
+		data = pd.read_csv(trainingData)
+		features = data.loc[:, 'Curvature':'CarPosition']
+		observation = data.loc[:, 'Class']
+
+		self.classifier = self.classifier.fit(features, observation)
 
 	#Dumps the trained model to a file
 	def dumpModel(self, fileName):
