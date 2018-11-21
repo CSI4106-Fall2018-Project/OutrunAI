@@ -1,7 +1,9 @@
 from Display import Display  # For extracting curvature
+from Controller import Controller #For changing camera view
 
 import win32api  # To read key presses
 import time  # To delay key press recognition
+import sys
 import pandas as pd  # To export data into a csv format
 
 class DataRecorder:
@@ -18,6 +20,8 @@ class DataRecorder:
 			'CarPosition': [],
 			'Class': []}
 
+		self.pause = False
+
 	def annotate(self):
 		"""
 		Records the road curvature, speed, and car position while the player is playing the game.
@@ -31,7 +35,7 @@ class DataRecorder:
 		print("1. Start the Outrun game")
 		print("2. Select a stage")
 		print("3. Once the race begins, press enter in this command prompt to start logging")
-		print("4. Logging will stop when you press CTRL + C in this command prompt")
+		print("4. Logging will pause when you press 'p', and stop when you press 'q'")
 		start = input("Press Enter to Start Logging: ")
 
 		#To allow the user to swap windows and start playing
@@ -39,9 +43,10 @@ class DataRecorder:
 			print(i)
 			time.sleep(1)
 
+		Controller.changeView()
 		print("Logging...")
 
-		while True:
+		while (self.pause == False):
 			try:
 				startTime = time.time()
 
@@ -58,12 +63,18 @@ class DataRecorder:
 				self.steering['Speed'].append(speed)
 				self.steering['CarPosition'].append(car_position)
 
-				self.getThrottle()  # Records if the player accelerated, braked, or coasted
-				self.getSteering()  # Records if the player went left, right, or straight
+				self.getThrottle() #Records if the player accelerated, braked, or coasted
+				self.getSteering() #Records if the player went left, right, or straight
+				
+				if (win32api.GetAsyncKeyState(0x51) < 0): #Stop recording when the user presses "q"
+					self.exportData()
+					break
+				elif (win32api.GetAsyncKeyState(0x50) < 0): #Pause recording when the user presses "p"
+					self.pause != self.pause
 
 				display.syncClock(startTime, time.time(), False)
 			except KeyboardInterrupt:
-				self.exportData()
+				self.exportData() #In the event the user uses Ctrl + C to exit, save the data
 				break
 
 	def getThrottle(self):
@@ -85,8 +96,8 @@ class DataRecorder:
 			self.steering['Class'].append('Straight')
 
 	def exportData(self):
-		pd.DataFrame(self.throttle).to_csv('training/Throttle.csv', mode = 'a', header = False)
-		pd.DataFrame(self.steering).to_csv('training/Steering.csv', mode = 'a', header = False)
+		pd.DataFrame(self.throttle).to_csv('training/Throttle.csv', mode = 'w', header = True)
+		pd.DataFrame(self.steering).to_csv('training/Steering.csv', mode = 'w', header = True)
 		print("Throttle Data Extracted in training/Throttle.csv")
 		print("Steering Data Extracted in training/Steering.csv")
 
