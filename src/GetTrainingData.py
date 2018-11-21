@@ -96,8 +96,8 @@ class DataRecorder:
 			self.steering['Class'].append('Straight')
 
 	def exportData(self):
-		pd.DataFrame(self.throttle).to_csv('training/Throttle.csv', mode = 'w', header = True)
-		pd.DataFrame(self.steering).to_csv('training/Steering.csv', mode = 'w', header = True)
+		pd.DataFrame(self.throttle).to_csv('../training/Throttle.csv', mode = 'w', header = True)
+		pd.DataFrame(self.steering).to_csv('../training/Steering.csv', mode = 'w', header = True)
 		print("Throttle Data Extracted in training/Throttle.csv")
 		print("Steering Data Extracted in training/Steering.csv")
 
