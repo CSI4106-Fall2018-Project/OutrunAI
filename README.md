@@ -13,6 +13,9 @@ Two supervised learning models have been implemented: a Decision Tree and a Mult
 src/ - Python 3 source files.  
 training/ - Sample training data and pre-fit learning models.
 
+## Levels suitable for training/ testing AI model
+2, 5, 6, 9, 12, 15, but YMMV
+
 ## Dependencies
 TBD
 
