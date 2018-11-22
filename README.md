@@ -31,4 +31,4 @@ ex. TrainModel.py NeuralNet ../training/case1/Throttle.csv ../training/case1/Ste
 ### Test AI models
 main.py runMode[DecisionTree, NeuralNet] trainedModelThrottle trainedModelSteering
 
-ex. main.py NeuralNet ../training/case1/trained mlp/throttleMLP.joblib ../training/case1/trained mlp/steeringMLP.joblib
+ex. main.py NeuralNet "../training/case1/trained mlp/throttle.joblib" "../training/case1/trained mlp/steering.joblib"
