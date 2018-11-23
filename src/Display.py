@@ -46,9 +46,7 @@ class Display:
 			roadCurvature, carPosition, outputFrame = self.calculateCurvature(roadFrame)
 
 			speed = self.calculateSpeed(rawFrame)
-			if not speed:
-				speed = 0
-			print(speed)
+
 			#Predict how to change throttle based on loaded model
 			if self.modelThrottle.predict([[roadCurvature, int(speed), carPosition]])[0] == "Accelerate":
 				Controller.accelerate()
@@ -75,7 +73,7 @@ class Display:
 			else:
 				print("Error ", self.modelSteering.predict([[roadCurvature, int(speed), carPosition]])[0])
 			
-			cv.imshow("Road Frame", outputFrame)
+			# cv.imshow("Road Frame", outputFrame)
 
 			#Should ALWAYS be called last (to ensure accurate synchronization and avoid undetectable delays)
 			self.syncClock(startTime, time.time(), False)
