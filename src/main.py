@@ -1,6 +1,6 @@
 from Display import Display
 import sys
-
+import os.path
 
 # Program entry point
 def main(runMode, trainedModelThrottle, trainedModelSteering):
@@ -16,6 +16,10 @@ def main(runMode, trainedModelThrottle, trainedModelSteering):
 	"""
 	if runMode not in {'DecisionTree', 'NeuralNet'}:
 		print("Incorrect run mode. Please chose either DecisionTree or NeuralNet")
+	elif not os.path.isfile(trainedModelThrottle):
+		print(trainedModelThrottle + " file not found")
+	elif not os.path.isfile(trainedModelSteering):
+		print(trainedModelSteering + " file not found")
 	else:
 		display = Display(trainedModelThrottle, trainedModelSteering, runMode, "Cannonball", 30)
 		display.run()
