@@ -12,7 +12,10 @@ from Controller import Controller
 
 class Display:
 	#Constructor
-	def __init__(self, trainedModelThrottle, trainedModelSteering, runMode = "NeuralNet", windowTitle = "", fps = -1):
+	def __init__(self, trainedModelThrottle = "../training/case1/trained mlp/throttle.joblib",
+				trainedModelSteering = "../training/case1/trained mlp/steering.joblib",
+				runMode = "NeuralNet",
+				windowTitle = "Cannonball", fps = -1):
 		self.trainedModelThrottle = trainedModelThrottle
 		self.trainedModelSteering = trainedModelSteering
 		self.runMode = runMode
@@ -70,7 +73,7 @@ class Display:
 			else:
 				print("Error ", self.modelSteering.predict([[roadCurvature, int(speed), carPosition]])[0])
 			
-			#cv.imshow("Road Frame", outputFrame)
+			# cv.imshow("Road Frame", outputFrame)
 
 			#Should ALWAYS be called last (to ensure accurate synchronization and avoid undetectable delays)
 			self.syncClock(startTime, time.time(), False)

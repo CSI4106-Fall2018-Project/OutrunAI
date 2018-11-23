@@ -30,7 +30,7 @@ class DataRecorder:
 		wait until the two minute logging window has passed.
 		On completion, this function outputs the annotated data into training/Steering.csv and training/Throttle.csv
 		"""
-		display = Display("Cannonball", 30)
+		display = Display(windowTitle="Cannonball", fps=30)
 
 		print("1. Start the Outrun game")
 		print("2. Select a stage")
