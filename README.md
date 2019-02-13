@@ -1,5 +1,6 @@
 # OutrunAI
 A supervised machine learning model designed to play the classic 1986 arcade game Outrun, implemented in Python 3.
+Video of AI gameplay: https://streamable.com/bsjzz
 
 ## Design
 The majority of the code is used for interacting with the game, and pre-trained learning models are provided. The normal execution of the game-playing loop follows a three step process:
